@@ -165,7 +165,7 @@ export const PropertyProvider = ({ children }: { children: ReactNode }) => {
   ======================= */
 
   const login = (username: string, password: string): boolean => {
-    if (username === "admin" && password === "admin123") {
+    if (username === "chetan" && password === "uskelwar@2625") {
       setIsAuthenticated(true);
       return true;
     }

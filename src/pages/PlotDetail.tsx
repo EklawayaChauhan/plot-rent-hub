@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useProperty } from '@/context/PropertyContext';
 import { toast } from '@/hooks/use-toast';
 
+const WHATSAPP_NUMBER = "9192272044485"; // 👈 replace with your number (no +, no spaces)
+
 const PlotDetail = () => {
   const { id } = useParams();
   const { plots } = useProperty();
@@ -44,10 +46,35 @@ const PlotDetail = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const whatsappMessage = `
+Hello, I am interested in this plot.
+
+📌 *Plot Name*: ${plot.title}
+📍 *Location*: ${plot.location}
+📐 *Size*: ${plot.size} ${plot.sizeUnit}
+📏 *Dimensions*: ${plot.dimensions}
+🏷️ *Type*: ${plot.type}
+💰 *Price*: ₹${plot.price.toLocaleString()}
+
+👤 *Name*: ${formData.name}
+📞 *Phone*: ${formData.phone}
+📧 *Email*: ${formData.email || "Not provided"}
+
+📝 *Message*:
+${formData.message || "Please contact me for more details."}
+    `.trim();
+
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+    window.open(whatsappURL, "_blank");
+
     toast({
-      title: "Inquiry Sent!",
-      description: "We'll get back to you shortly about this plot.",
+      title: "Redirecting to WhatsApp",
+      description: "Please send the message to complete your inquiry.",
     });
+
     setFormData({ name: '', email: '', phone: '', message: '' });
   };
 
@@ -107,7 +134,6 @@ const PlotDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Title & Price */}
               <div>
                 <h1 className="text-3xl sm:text-4xl font-heading font-bold mb-4">{plot.title}</h1>
                 <div className="flex items-center gap-2 text-muted-foreground mb-4">
@@ -115,7 +141,7 @@ const PlotDetail = () => {
                   <span>{plot.location}</span>
                 </div>
                 <div className="text-4xl font-heading font-bold gradient-text">
-                  ${plot.price.toLocaleString()}
+                  ₹{plot.price.toLocaleString()}
                 </div>
               </div>
 
@@ -163,7 +189,7 @@ const PlotDetail = () => {
               </div>
             </div>
 
-            {/* Sidebar - Contact Form */}
+            {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-card border border-white/10 rounded-xl p-6 sticky top-24 shadow-glow">
                 <h3 className="text-xl font-heading font-semibold mb-6">Schedule Site Visit</h3>
@@ -182,7 +208,6 @@ const PlotDetail = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="input-dark"
-                    required
                   />
                   <Input
                     type="tel"

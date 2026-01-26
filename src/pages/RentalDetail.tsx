@@ -10,6 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { useProperty } from '@/context/PropertyContext';
 import { toast } from '@/hooks/use-toast';
 
+const WHATSAPP_NUMBER = "919272044485"; 
+// example: 919876543210 (NO +, NO spaces)
+
+
 const RentalDetail = () => {
   const { id } = useParams();
   const { houses } = useProperty();
@@ -42,14 +46,38 @@ const RentalDetail = () => {
 
   const similarHouses = houses.filter(h => h.id !== house.id && h.bedrooms === house.bedrooms).slice(0, 3);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Inquiry Sent!",
-      description: "We'll get back to you shortly about this rental.",
-    });
-    setFormData({ name: '', email: '', phone: '', message: '' });
-  };
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const whatsappMessage = `
+Hello, I am interested in this rental property.
+
+🏠 *Property*: ${house.title}
+📍 *Location*: ${house.location}
+💰 *Rent*: ₹${house.monthlyRent.toLocaleString()}/month
+
+👤 *Name*: ${formData.name}
+📞 *Phone*: ${formData.phone}
+📧 *Email*: ${formData.email}
+
+📝 *Message*:
+${formData.message || "Please contact me for more details."}
+  `.trim();
+
+  const encodedMessage = encodeURIComponent(whatsappMessage);
+
+  const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+  window.open(whatsappURL, "_blank");
+
+  toast({
+    title: "Redirecting to WhatsApp",
+    description: "Please send the message to complete your inquiry.",
+  });
+
+  setFormData({ name: '', email: '', phone: '', message: '' });
+};
+
 
   const nextImage = () => {
     setCurrentImage((prev) => (prev + 1) % house.images.length);

@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 
+const WHATSAPP_NUMBER = "919272044485"; // 👈 replace with your WhatsApp number
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -18,11 +20,37 @@ const Contact = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const whatsappMessage = `
+Hello, I would like to contact you.
+
+👤 *Name*: ${formData.name}
+📞 *Phone*: ${formData.phone || "Not provided"}
+📧 *Email*: ${formData.email}
+
+📌 *Subject*: ${formData.subject}
+
+📝 *Message*:
+${formData.message}
+    `.trim();
+
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+    window.open(whatsappURL, "_blank");
+
     toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We'll respond within 24 hours.",
+      title: "Redirecting to WhatsApp",
+      description: "Please send the message to complete your inquiry.",
     });
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: ''
+    });
   };
 
   const contactInfo = [
@@ -60,7 +88,7 @@ const Contact = () => {
                 Get In <span className="gradient-text">Touch</span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Have questions about a property or need assistance? We're here to help. 
+                Have questions about a property or need assistance? We're here to help.
                 Reach out to us and our team will get back to you promptly.
               </p>
             </div>
@@ -68,7 +96,9 @@ const Contact = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Contact Form */}
               <div className="bg-card border border-white/10 rounded-xl p-8 shadow-glow">
-                <h2 className="text-2xl font-heading font-semibold mb-6">Send Us a Message</h2>
+                <h2 className="text-2xl font-heading font-semibold mb-6">
+                  Send Us a Message
+                </h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
@@ -88,6 +118,7 @@ const Contact = () => {
                       required
                     />
                   </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
                       type="tel"
@@ -105,6 +136,7 @@ const Contact = () => {
                       required
                     />
                   </div>
+
                   <Textarea
                     placeholder="Your Message"
                     value={formData.message}
@@ -113,6 +145,7 @@ const Contact = () => {
                     rows={6}
                     required
                   />
+
                   <Button type="submit" className="w-full btn-gradient h-12">
                     Send Message
                   </Button>
@@ -149,6 +182,7 @@ const Contact = () => {
                 </div>
               </div>
             </div>
+
           </div>
         </section>
       </main>

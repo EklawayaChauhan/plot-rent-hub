@@ -24,11 +24,20 @@ const Navbar = () => {
       <div className="container-custom">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-heading font-bold gradient-text">
-              PropLand
-            </span>
-          </Link>
+          <Link to="/" className="flex items-center gap-3">
+  {/* Logo */}
+  <img
+    src="/logo.png"
+    alt="VR Land Developers and Infrastructure"
+    className="h-10 w-auto object-contain"
+  />
+
+  {/* Brand Name */}
+  <span className="text-xl sm:text-2xl font-heading font-bold gradient-text leading-tight">
+    VR Land Developers <span className="hidden sm:inline">and Infrastructure</span>
+  </span>
+</Link>
+
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">

@@ -28,7 +28,7 @@ const Footer = () => {
           <div>
             <Link to="/" className="inline-block mb-4">
               <span className="text-2xl font-heading font-bold gradient-text">
-                PropLand
+                VR Land Developers and Infrastructure
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
@@ -73,20 +73,19 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <span className="text-muted-foreground text-sm">
-                  123 Property Lane, Real Estate District,<br />
-                  Metro City, MC 12345
+                  Plot no. 12 sarashwati nagar -3 uskelwar layout pipla road hudkeshwar nagpur 440034
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary flex-shrink-0" />
                 <a href="tel:+1234567890" className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm">
-                  +1 (234) 567-890
+                  +91 98341 32567
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary flex-shrink-0" />
-                <a href="mailto:info@propland.com" className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm">
-                  info@propland.com
+                <a href="mailto:chetanuskelwar1@gmail.com" className="text-muted-foreground hover:text-primary transition-colors duration-300 text-sm">
+                  chetanuskelwar1@gmail.com
                 </a>
               </li>
             </ul>
