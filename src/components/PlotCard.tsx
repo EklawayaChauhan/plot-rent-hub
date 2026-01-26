@@ -29,7 +29,7 @@ const PlotCard = ({ plot }: PlotCardProps) => {
         {/* Price */}
         <div className="mb-3">
           <span className="text-2xl font-heading font-bold gradient-text">
-            ${plot.price.toLocaleString()}
+           ₹{plot.price.toLocaleString()}
           </span>
         </div>
 
