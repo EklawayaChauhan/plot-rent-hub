@@ -57,17 +57,17 @@ ${formData.message}
     {
       icon: MapPin,
       title: 'Visit Us',
-      content: '123 Property Lane, Real Estate District,\nMetro City, MC 12345'
+      content: 'Plot no. 12 sarashwati nagar -3 uskelwar layout pipla road hudkeshwar nagpur 440034'
     },
     {
       icon: Phone,
       title: 'Call Us',
-      content: '+1 (234) 567-890\n+1 (234) 567-891'
+      content: '+91 98341 32567'
     },
     {
       icon: Mail,
       title: 'Email Us',
-      content: 'info@propland.com\nsupport@propland.com'
+      content: 'chetanuskelwar1@gmail.com'
     },
     {
       icon: Clock,
