@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 
-const WHATSAPP_NUMBER = "9198341 32567"; // 👈 replace with your WhatsApp number
+const WHATSAPP_NUMBER = "919834132567"; // 👈 replace with your WhatsApp number
 
 const Contact = () => {
   const [formData, setFormData] = useState({
