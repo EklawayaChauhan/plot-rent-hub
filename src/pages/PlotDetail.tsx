@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useProperty } from '@/context/PropertyContext';
 import { toast } from '@/hooks/use-toast';
 
-const WHATSAPP_NUMBER = "9192272044485"; // 👈 replace with your number (no +, no spaces)
+const WHATSAPP_NUMBER = "9198341 32567"; // 👈 replace with your number (no +, no spaces)
 
 const PlotDetail = () => {
   const { id } = useParams();
