@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useProperty } from '@/context/PropertyContext';
 import { toast } from '@/hooks/use-toast';
 
-const WHATSAPP_NUMBER = "919272044485"; 
+const WHATSAPP_NUMBER = "919834132567"; 
 // example: 919876543210 (NO +, NO spaces)
 
 
