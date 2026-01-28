@@ -95,7 +95,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/10 text-center">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} PropLand. All rights reserved.
+            © {new Date().getFullYear()} VR Land Developers. All rights reserved.
           </p>
         </div>
       </div>
