@@ -15,7 +15,7 @@ const WHATSAPP_NUMBER = "9192272044485"; // 👈 replace with your number (no +,
 const PlotDetail = () => {
   const { id } = useParams();
   const { plots } = useProperty();
-  const plot = plots.find(p => p.id === parseInt(id || '0'));
+  const plot = plots.find(p => p.id === id);
   const [currentImage, setCurrentImage] = useState(0);
   const [formData, setFormData] = useState({
     name: '',

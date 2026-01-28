@@ -56,7 +56,7 @@ const PlotsListing = () => {
         result.sort((a, b) => b.size - a.size);
         break;
       default:
-        result.sort((a, b) => b.id - a.id);
+        result.sort((a, b) => b.id.localeCompare(a.id));
     }
 
     return result;

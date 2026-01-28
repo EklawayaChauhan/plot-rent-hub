@@ -17,7 +17,7 @@ const WHATSAPP_NUMBER = "919272044485";
 const RentalDetail = () => {
   const { id } = useParams();
   const { houses } = useProperty();
-  const house = houses.find(h => h.id === parseInt(id || '0'));
+  const house = houses.find(h => h.id === id);
   const [currentImage, setCurrentImage] = useState(0);
   const [formData, setFormData] = useState({
     name: '',

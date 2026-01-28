@@ -1,22 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Trash2, MapPin, X, Upload, Image } from 'lucide-react';
+import { Plus, Trash2, MapPin, X, Upload, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useProperty, Plot, RentalHouse } from '@/context/PropertyContext';
 import { toast } from '@/hooks/use-toast';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { plots, houses, addPlot, deletePlot, addHouse, deleteHouse, isAuthenticated, logout } = useProperty();
+  const { plots, houses, addPlot, deletePlot, addHouse, deleteHouse, isAuthenticated, logout, loading, user } = useProperty();
   const [showPlotForm, setShowPlotForm] = useState(false);
   const [showHouseForm, setShowHouseForm] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'plot' | 'house'; id: number } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ type: 'plot' | 'house'; id: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Plot form state
   const [plotForm, setPlotForm] = useState({
@@ -52,8 +53,21 @@ const AdminDashboard = () => {
   const houseAmenities = ['Parking', 'Garden', 'Balcony', 'Kitchen Appliances', 'WiFi Ready', 'Pool Access', 'Gym Access'];
 
   // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/admin/login');
+    }
+  }, [isAuthenticated, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
-    navigate('/admin/login');
     return null;
   }
 
@@ -80,64 +94,93 @@ const AdminDashboard = () => {
     }
   };
 
-  const handlePlotSubmit = (e: React.FormEvent) => {
+  const handlePlotSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addPlot({
-      title: plotForm.title,
-      price: parseInt(plotForm.price),
-      location: plotForm.location,
-      size: parseInt(plotForm.size),
-      sizeUnit: plotForm.sizeUnit,
-      dimensions: plotForm.dimensions,
-      type: plotForm.type,
-      description: plotForm.description,
-      images: plotImages.length > 0 ? plotImages : ['/placeholder.svg'],
-      features: plotForm.features
-    });
-    toast({ title: "Success!", description: "Plot added successfully." });
-    setShowPlotForm(false);
-    setPlotForm({
-      title: '', price: '', location: '', size: '', sizeUnit: 'sq ft',
-      dimensions: '', type: 'Residential', description: '', features: []
-    });
-    setPlotImages([]);
-  };
-
-  const handleHouseSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    addHouse({
-      title: houseForm.title,
-      monthlyRent: parseInt(houseForm.monthlyRent),
-      deposit: parseInt(houseForm.deposit),
-      location: houseForm.location,
-      bedrooms: parseInt(houseForm.bedrooms),
-      bathrooms: parseInt(houseForm.bathrooms),
-      sqft: parseInt(houseForm.sqft),
-      furnishing: houseForm.furnishing,
-      availableFrom: houseForm.availableFrom,
-      description: houseForm.description,
-      images: houseImages.length > 0 ? houseImages : ['/placeholder.svg'],
-      amenities: houseForm.amenities
-    });
-    toast({ title: "Success!", description: "Rental house added successfully." });
-    setShowHouseForm(false);
-    setHouseForm({
-      title: '', monthlyRent: '', deposit: '', location: '', bedrooms: '',
-      bathrooms: '', sqft: '', furnishing: 'Unfurnished', availableFrom: '', description: '', amenities: []
-    });
-    setHouseImages([]);
-  };
-
-  const handleDelete = () => {
-    if (!deleteConfirm) return;
-    if (deleteConfirm.type === 'plot') {
-      deletePlot(deleteConfirm.id);
-      toast({ title: "Deleted", description: "Plot removed successfully." });
-    } else {
-      deleteHouse(deleteConfirm.id);
-      toast({ title: "Deleted", description: "Rental house removed successfully." });
+    setIsSubmitting(true);
+    
+    try {
+      await addPlot({
+        title: plotForm.title,
+        price: parseInt(plotForm.price),
+        location: plotForm.location,
+        size: parseInt(plotForm.size),
+        sizeUnit: plotForm.sizeUnit,
+        dimensions: plotForm.dimensions,
+        type: plotForm.type,
+        description: plotForm.description,
+        images: plotImages.length > 0 ? plotImages : ['/placeholder.svg'],
+        features: plotForm.features
+      });
+      toast({ title: "Success!", description: "Plot added successfully." });
+      setShowPlotForm(false);
+      setPlotForm({
+        title: '', price: '', location: '', size: '', sizeUnit: 'sq ft',
+        dimensions: '', type: 'Residential', description: '', features: []
+      });
+      setPlotImages([]);
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to add plot. Please try again.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
     }
-    setDeleteConfirm(null);
+  };
+
+  const handleHouseSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      await addHouse({
+        title: houseForm.title,
+        monthlyRent: parseInt(houseForm.monthlyRent),
+        deposit: parseInt(houseForm.deposit),
+        location: houseForm.location,
+        bedrooms: parseInt(houseForm.bedrooms),
+        bathrooms: parseInt(houseForm.bathrooms),
+        sqft: parseInt(houseForm.sqft),
+        furnishing: houseForm.furnishing,
+        availableFrom: houseForm.availableFrom,
+        description: houseForm.description,
+        images: houseImages.length > 0 ? houseImages : ['/placeholder.svg'],
+        amenities: houseForm.amenities
+      });
+      toast({ title: "Success!", description: "Rental house added successfully." });
+      setShowHouseForm(false);
+      setHouseForm({
+        title: '', monthlyRent: '', deposit: '', location: '', bedrooms: '',
+        bathrooms: '', sqft: '', furnishing: 'Unfurnished', availableFrom: '', description: '', amenities: []
+      });
+      setHouseImages([]);
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to add rental house. Please try again.", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
+    setIsSubmitting(true);
+    
+    try {
+      if (deleteConfirm.type === 'plot') {
+        await deletePlot(deleteConfirm.id);
+        toast({ title: "Deleted", description: "Plot removed successfully." });
+      } else {
+        await deleteHouse(deleteConfirm.id);
+        toast({ title: "Deleted", description: "Rental house removed successfully." });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to delete. Please try again.", variant: "destructive" });
+    } finally {
+      setDeleteConfirm(null);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   const toggleFeature = (feature: string) => {
@@ -163,8 +206,11 @@ const AdminDashboard = () => {
       {/* Header */}
       <header className="glass border-b border-white/10 sticky top-0 z-50">
         <div className="container-custom flex items-center justify-between h-16">
-          <h1 className="text-xl font-heading font-bold gradient-text">Admin Dashboard</h1>
-          <Button onClick={() => { logout(); navigate('/'); }} variant="ghost" className="text-muted-foreground hover:text-white">
+          <div>
+            <h1 className="text-xl font-heading font-bold gradient-text">Admin Dashboard</h1>
+            {user && <p className="text-xs text-muted-foreground">{user.email}</p>}
+          </div>
+          <Button onClick={handleLogout} variant="ghost" className="text-muted-foreground hover:text-white">
             Logout
           </Button>
         </div>
@@ -190,32 +236,38 @@ const AdminDashboard = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {plots.map(plot => (
-                <div key={plot.id} className="bg-card border border-white/10 rounded-xl overflow-hidden">
-                  <div className="aspect-video relative">
-                    <img src={plot.images[0]} alt={plot.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold mb-1 line-clamp-1">{plot.title}</h3>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-                      <MapPin className="w-3 h-3" /> {plot.location}
+            {plots.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>No plots added yet. Click "Add New Plot" to get started.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {plots.map(plot => (
+                  <div key={plot.id} className="bg-card border border-white/10 rounded-xl overflow-hidden">
+                    <div className="aspect-video relative">
+                      <img src={plot.images[0]} alt={plot.title} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">${plot.price.toLocaleString()}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10"
-                        onClick={() => setDeleteConfirm({ type: 'plot', id: plot.id })}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                    <div className="p-4">
+                      <h3 className="font-semibold mb-1 line-clamp-1">{plot.title}</h3>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                        <MapPin className="w-3 h-3" /> {plot.location}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-primary">₹{plot.price.toLocaleString()}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeleteConfirm({ type: 'plot', id: plot.id })}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           {/* Houses Tab */}
@@ -227,32 +279,38 @@ const AdminDashboard = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {houses.map(house => (
-                <div key={house.id} className="bg-card border border-white/10 rounded-xl overflow-hidden">
-                  <div className="aspect-video relative">
-                    <img src={house.images[0]} alt={house.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold mb-1 line-clamp-1">{house.title}</h3>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-                      <MapPin className="w-3 h-3" /> {house.location}
+            {houses.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>No rental houses added yet. Click "Add New Rental" to get started.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {houses.map(house => (
+                  <div key={house.id} className="bg-card border border-white/10 rounded-xl overflow-hidden">
+                    <div className="aspect-video relative">
+                      <img src={house.images[0]} alt={house.title} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">${house.monthlyRent.toLocaleString()}/mo</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10"
-                        onClick={() => setDeleteConfirm({ type: 'house', id: house.id })}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                    <div className="p-4">
+                      <h3 className="font-semibold mb-1 line-clamp-1">{house.title}</h3>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                        <MapPin className="w-3 h-3" /> {house.location}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-lg font-bold text-primary">₹{house.monthlyRent.toLocaleString()}/mo</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeleteConfirm({ type: 'house', id: house.id })}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </main>
@@ -266,7 +324,7 @@ const AdminDashboard = () => {
           <form onSubmit={handlePlotSubmit} className="space-y-4">
             <Input placeholder="Plot Title" value={plotForm.title} onChange={e => setPlotForm({...plotForm, title: e.target.value})} className="input-dark" required />
             <div className="grid grid-cols-2 gap-4">
-              <Input type="number" placeholder="Price ($)" value={plotForm.price} onChange={e => setPlotForm({...plotForm, price: e.target.value})} className="input-dark" required />
+              <Input type="number" placeholder="Price (₹)" value={plotForm.price} onChange={e => setPlotForm({...plotForm, price: e.target.value})} className="input-dark" required />
               <Input placeholder="Location" value={plotForm.location} onChange={e => setPlotForm({...plotForm, location: e.target.value})} className="input-dark" required />
             </div>
             <div className="grid grid-cols-3 gap-4">
@@ -330,7 +388,9 @@ const AdminDashboard = () => {
 
             <DialogFooter className="gap-2">
               <DialogClose asChild><Button type="button" variant="outline" className="border-white/20">Cancel</Button></DialogClose>
-              <Button type="submit" className="btn-gradient">Save Plot</Button>
+              <Button type="submit" className="btn-gradient" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Plot'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -345,8 +405,8 @@ const AdminDashboard = () => {
           <form onSubmit={handleHouseSubmit} className="space-y-4">
             <Input placeholder="House Title" value={houseForm.title} onChange={e => setHouseForm({...houseForm, title: e.target.value})} className="input-dark" required />
             <div className="grid grid-cols-2 gap-4">
-              <Input type="number" placeholder="Monthly Rent ($)" value={houseForm.monthlyRent} onChange={e => setHouseForm({...houseForm, monthlyRent: e.target.value})} className="input-dark" required />
-              <Input type="number" placeholder="Security Deposit ($)" value={houseForm.deposit} onChange={e => setHouseForm({...houseForm, deposit: e.target.value})} className="input-dark" required />
+              <Input type="number" placeholder="Monthly Rent (₹)" value={houseForm.monthlyRent} onChange={e => setHouseForm({...houseForm, monthlyRent: e.target.value})} className="input-dark" required />
+              <Input type="number" placeholder="Security Deposit (₹)" value={houseForm.deposit} onChange={e => setHouseForm({...houseForm, deposit: e.target.value})} className="input-dark" required />
             </div>
             <Input placeholder="Location" value={houseForm.location} onChange={e => setHouseForm({...houseForm, location: e.target.value})} className="input-dark" required />
             <div className="grid grid-cols-3 gap-4">
@@ -363,7 +423,7 @@ const AdminDashboard = () => {
                   <SelectItem value="Fully Furnished">Fully Furnished</SelectItem>
                 </SelectContent>
               </Select>
-              <Input type="date" placeholder="Available From" value={houseForm.availableFrom} onChange={e => setHouseForm({...houseForm, availableFrom: e.target.value})} className="input-dark" required />
+              <Input type="date" placeholder="Available From" value={houseForm.availableFrom} onChange={e => setHouseForm({...houseForm, availableFrom: e.target.value})} className="input-dark" />
             </div>
             <Textarea placeholder="Description" value={houseForm.description} onChange={e => setHouseForm({...houseForm, description: e.target.value})} className="input-dark min-h-[100px]" required />
             
@@ -406,7 +466,9 @@ const AdminDashboard = () => {
 
             <DialogFooter className="gap-2">
               <DialogClose asChild><Button type="button" variant="outline" className="border-white/20">Cancel</Button></DialogClose>
-              <Button type="submit" className="btn-gradient">Save Rental</Button>
+              <Button type="submit" className="btn-gradient" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Rental'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -420,8 +482,10 @@ const AdminDashboard = () => {
           </DialogHeader>
           <p className="text-muted-foreground">Are you sure you want to delete this {deleteConfirm?.type}? This action cannot be undone.</p>
           <DialogFooter className="gap-2">
-            <DialogClose asChild><Button variant="outline" className="border-white/20">Cancel</Button></DialogClose>
-            <Button onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">Delete</Button>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)} className="border-white/20">Cancel</Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
