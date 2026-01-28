@@ -19,25 +19,26 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleLogout = async () => {
+    await logout();
+    setIsOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
       <div className="container-custom">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-  {/* Logo */}
-  <img
-    src="/logo.png"
-    alt="VR Land Developers and Infrastructure"
-    className="h-10 w-auto object-contain"
-  />
-
-  {/* Brand Name */}
-  <span className="text-xl sm:text-2xl font-heading font-bold gradient-text leading-tight">
-    VR Land Developers <span className="hidden sm:inline">and Infrastructure</span>
-  </span>
-</Link>
-
+            <img
+              src="/logo.png"
+              alt="VR Land Developers and Infrastructure"
+              className="h-10 w-auto object-contain"
+            />
+            <span className="text-xl sm:text-2xl font-heading font-bold gradient-text leading-tight">
+              VR Land Developers <span className="hidden sm:inline">and Infrastructure</span>
+            </span>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
@@ -63,7 +64,7 @@ const Navbar = () => {
                     Dashboard
                   </Button>
                 </Link>
-                <Button onClick={logout} variant="ghost" className="text-muted-foreground hover:text-white">
+                <Button onClick={handleLogout} variant="ghost" className="text-muted-foreground hover:text-white">
                   Logout
                 </Button>
               </>
@@ -108,7 +109,7 @@ const Navbar = () => {
                       Dashboard
                     </Button>
                   </Link>
-                  <Button onClick={() => { logout(); setIsOpen(false); }} variant="ghost" className="w-full text-muted-foreground hover:text-white">
+                  <Button onClick={handleLogout} variant="ghost" className="w-full text-muted-foreground hover:text-white">
                     Logout
                   </Button>
                 </>

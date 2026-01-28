@@ -66,7 +66,7 @@ const RentalsListing = () => {
         result.sort((a, b) => b.sqft - a.sqft);
         break;
       default:
-        result.sort((a, b) => b.id - a.id);
+        result.sort((a, b) => b.id.localeCompare(a.id));
     }
 
     return result;
